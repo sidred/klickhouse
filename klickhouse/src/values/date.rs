@@ -31,6 +31,23 @@ impl FromSql for Date {
     }
 }
 
+impl From<Date> for chrono::NaiveDate {
+    fn from(date: Date) -> Self {
+       let res = Utc.from_utc_date(&NaiveDate::from_ymd(1970, 01, 01)) + Duration::days(date.0 as i64);
+       res.naive_utc()
+    }
+}
+
+impl From<chrono::NaiveDate> for Date {
+    fn from(other: chrono::NaiveDate) -> Self {
+        Self(
+            other
+                .signed_duration_since(NaiveDate::from_ymd(1970, 01, 01))
+                .num_days() as u16,
+        )
+    }
+}
+
 impl From<Date> for chrono::Date<Utc> {
     fn from(date: Date) -> Self {
         Utc.from_utc_date(&NaiveDate::from_ymd(1970, 01, 01)) + Duration::days(date.0 as i64)
