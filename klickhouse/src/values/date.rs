@@ -152,6 +152,19 @@ impl<const PRECISION: usize> Default for DateTime64<PRECISION> {
     }
 }
 
+impl ToSql for chrono::NaiveDate {
+    fn to_sql(self) -> Result<Value> {
+        let dt: Date =  self.into();
+        dt.to_sql()
+    }
+}
+
+impl FromSql for chrono::NaiveDate {
+    fn from_sql(type_: &Type, value: Value) -> Result<Self> {
+        Date::from_sql(type_, value).map(|v| v.into())
+    }
+}
+
 impl ToSql for chrono::DateTime<Utc> {
     fn to_sql(self) -> Result<Value> {
         Ok(Value::DateTime64(
